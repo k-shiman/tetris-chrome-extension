@@ -228,7 +228,7 @@ function getGhostPosition() {
 
 function draw() {
   const theme = document.body.className;
-  if (theme === 'theme-light') ctx.fillStyle = '#ffffff';
+  if (theme === 'theme-light') ctx.fillStyle = '#a39e9e';
   else if (theme === 'theme-neon') ctx.fillStyle = '#111';
   else if (theme === 'theme-retro') ctx.fillStyle = '#8bac0f';
   else if (theme === 'theme-matrix') ctx.fillStyle = '#000000';
