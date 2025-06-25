@@ -95,24 +95,30 @@ function playerMove(dir) {
   if (collide(arena, player)) player.pos.x -= dir;
 }
 
-function rotate(matrix) {
-  const m = matrix.map((row, y) => row.map((_, x) => matrix[matrix.length - 1 - x][y]));
-  return m;
+function rotateMatrix(matrix) {
+  const N = matrix.length;
+  const result = Array.from({ length: N }, () => Array(N).fill(0));
+  for (let y = 0; y < N; ++y) {
+    for (let x = 0; x < N; ++x) {
+      result[x][N - 1 - y] = matrix[y][x];
+    }
+  }
+  return result;
 }
 
-function playerRotate(dir) {
-  const old = player.matrix;
-  const rotated = rotate(player.matrix);
-  const originalX = player.pos.x;
-  let offset = 1;
-  player.matrix = rotated;
+function playerRotate() {
+  const prevMatrix = player.matrix;
+  const rotated = rotateMatrix(player.matrix);
 
+  player.matrix = rotated;
+  const pos = player.pos.x;
+  let offset = 1;
   while (collide(arena, player)) {
     player.pos.x += offset;
     offset = -(offset + (offset > 0 ? 1 : -1));
     if (offset > player.matrix[0].length) {
-      player.matrix = old;
-      player.pos.x = originalX;
+      player.matrix = prevMatrix;
+      player.pos.x = pos;
       return;
     }
   }
@@ -175,7 +181,7 @@ document.addEventListener('keydown', event => {
   if (event.key === 'ArrowLeft') playerMove(-1);
   else if (event.key === 'ArrowRight') playerMove(1);
   else if (event.key === 'ArrowDown') playerDrop();
-  else if (event.key === 'w' || event.key === 'ArrowUp') playerRotate(1);
+  else if (event.key === 'w' || event.key === 'ArrowUp') playerRotate();
 });
 
 btnEasy.addEventListener('click', () => setLevel(1000));
