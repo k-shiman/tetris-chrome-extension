@@ -75,13 +75,6 @@ Use the **Pause** and **Change Theme** buttons for control via mouse.
 ![gameplay_photo5](https://github.com/user-attachments/assets/9fdaac3a-edcf-4eba-8569-75b7d4244c3a)
 
 
-
-
-<p align="center">
-  <img src="screenshots/light-theme.png" width="230" alt="Light Theme Screenshot" />
-  <img src="screenshots/retro-theme.png" width="230" alt="Retro Theme Screenshot" />
-</p>
-
 ---
 
 ## 🔗 Chrome Extension Store
