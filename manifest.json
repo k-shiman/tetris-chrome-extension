@@ -1,0 +1,13 @@
+{
+  "manifest_version": 3,
+  "name": "Tetris by k-shiman",
+  "version": "1.0",
+  "description": "Play classic Tetris in your browser extension!",
+  "action": {
+    "default_popup": "index.html",
+    "default_icon": "icon.png"
+  },
+  "icons": {
+    "48": "icon.png"
+  }
+}
