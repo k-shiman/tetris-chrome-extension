@@ -320,6 +320,14 @@ function resetGame() {
   requestAnimationFrame(update);
 }
 
+
+window.addEventListener("keydown", e => {
+  if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(e.key)) {
+    e.preventDefault();
+  }
+}, { passive: false });
+
+
 const arena = createMatrix(cols, rows);
 const player = { pos: {}, matrix: null, type: null };
 let startTime = performance.now();
