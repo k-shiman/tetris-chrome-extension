@@ -2,13 +2,23 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Tetris Extension</title>
+  <meta name="viewport" content="width=260,initial-scale=1.0">
+  <title>Tetris</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <h1>Tetris</h1>
-  <canvas id="tetris" width="240" height="400"></canvas>
+  <div id="ui">
+    <div>
+      <button id="btn-easy">Easy</button>
+      <button id="btn-medium">Medium</button>
+      <button id="btn-hard">Hard</button>
+    </div>
+    <div id="status">
+      <span>Score: <span id="score">0</span></span>
+      <span>Time: <span id="timer">0</span>s</span>
+    </div>
+  </div>
+  <canvas id="tetris"></canvas>
   <script src="script.js"></script>
 </body>
 </html>
