@@ -1,0 +1,62 @@
+body {
+  margin: 0;
+  padding: 10px;
+  width: 260px;
+  background: #0a0f3c;
+  font-family: sans-serif;
+  user-select: none;
+}
+
+#ui {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.btn-group button {
+  margin-right: 5px;
+  padding: 4px 8px;
+  background: #2a3a7c;
+  color: #fff;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+  transition: background 0.3s ease, transform 0.2s ease;
+}
+
+.btn-group button:hover {
+  background: #ff8c00;
+  transform: scale(1.05);
+}
+
+#status {
+  display: flex;
+  justify-content: space-between;
+  width: 120px;
+}
+
+#status span {
+  font-size: 14px;
+  color: #eee;
+}
+
+canvas {
+  display: block;
+  margin: 10px auto;
+  background: #101744;
+  border: 2px solid #3a4a9c;
+  box-shadow: 0 0 10px #0008;
+}
+
+#message {
+  text-align: center;
+  color: #f55;
+  font-size: 18px;
+  margin-top: 6px;
+  animation: fadeIn 0.5s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
