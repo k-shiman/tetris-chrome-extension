@@ -26,25 +26,27 @@ const shapeColors = {
 };
 
 function createMatrix(w, h) {
-  return Array.from({length: h}, () => new Array(w).fill(null));
+  return Array.from({ length: h }, () => new Array(w).fill(null));
 }
 
 function createPiece(type) {
-  if (type === 'T') return [[0,1,0],[1,1,1]];
-  if (type === 'J') return [[1,0,0],[1,1,1]];
-  if (type === 'L') return [[0,0,1],[1,1,1]];
-  if (type === 'O') return [[1,1],[1,1]];
-  if (type === 'S') return [[0,1,1],[1,1,0]];
-  if (type === 'Z') return [[1,1,0],[0,1,1]];
-  if (type === 'I') return [[1,1,1,1]];
+  if (type === 'T') return [[0, 1, 0], [1, 1, 1]];
+  if (type === 'J') return [[1, 0, 0], [1, 1, 1]];
+  if (type === 'L') return [[0, 0, 1], [1, 1, 1]];
+  if (type === 'O') return [[1, 1], [1, 1]];
+  if (type === 'S') return [[0, 1, 1], [1, 1, 0]];
+  if (type === 'Z') return [[1, 1, 0], [0, 1, 1]];
+  if (type === 'I') return [[1, 1, 1, 1]];
 }
 
 function collide(arena, player) {
-  const { matrix: m, pos: o } = player;
-  for (let y = 0; y < m.length; ++y) {
-    for (let x = 0; x < m[y].length; ++x) {
-      if (m[y][x] &&
-         (arena[y + o.y] && arena[y + o.y][x + o.x]) !== null) {
+  const { matrix, pos } = player;
+  for (let y = 0; y < matrix.length; ++y) {
+    for (let x = 0; x < matrix[y].length; ++x) {
+      if (
+        matrix[y][x] &&
+        (arena[y + pos.y] && arena[y + pos.y][x + pos.x]) !== null
+      ) {
         return true;
       }
     }
@@ -93,22 +95,24 @@ function playerMove(dir) {
   if (collide(arena, player)) player.pos.x -= dir;
 }
 
-function playerRotate(dir) {
-  const m = player.matrix;
-  for (let y = 0; y < m.length; ++y) {
-    for (let x = 0; x < y; ++x) {
-     ;[m[x][y], m[y][x]] = [m[y][x], m[x][y]];
-    }
-  }
-  if (dir > 0) m.forEach(row => row.reverse());
-  else m.reverse();
+function rotate(matrix) {
+  const m = matrix.map((row, y) => row.map((_, x) => matrix[matrix.length - 1 - x][y]));
+  return m;
+}
 
+function playerRotate(dir) {
+  const old = player.matrix;
+  const rotated = rotate(player.matrix);
+  const originalX = player.pos.x;
   let offset = 1;
+  player.matrix = rotated;
+
   while (collide(arena, player)) {
     player.pos.x += offset;
     offset = -(offset + (offset > 0 ? 1 : -1));
-    if (offset > m[0].length) {
-      playerRotate(-dir);
+    if (offset > player.matrix[0].length) {
+      player.matrix = old;
+      player.pos.x = originalX;
       return;
     }
   }
@@ -197,6 +201,6 @@ function resetGame() {
 }
 
 const arena = createMatrix(cols, rows);
-const player = {pos: {}, matrix: null, type: null};
+const player = { pos: {}, matrix: null, type: null };
 let startTime = performance.now();
 resetGame();
