@@ -96,15 +96,17 @@ function playerMove(dir) {
 }
 
 function rotateMatrix(matrix) {
-  const N = matrix.length;
-  const result = Array.from({ length: N }, () => Array(N).fill(0));
-  for (let y = 0; y < N; ++y) {
-    for (let x = 0; x < N; ++x) {
-      result[x][N - 1 - y] = matrix[y][x];
+  const rows = matrix.length;
+  const cols = matrix[0].length;
+  const rotated = Array.from({ length: cols }, () => Array(rows).fill(0));
+  for (let y = 0; y < rows; ++y) {
+    for (let x = 0; x < cols; ++x) {
+      rotated[x][rows - 1 - y] = matrix[y][x];
     }
   }
-  return result;
+  return rotated;
 }
+
 
 function playerRotate() {
   const prevMatrix = player.matrix;
