@@ -20,15 +20,60 @@ canvas.width = gridSize * cols;
 canvas.height = gridSize * rows;
 
 const shapes = 'TJLOSZI';
-const shapeColors = {
-  T: '#C864F2',
-  J: '#3264F2',
-  L: '#F2A464',
-  O: '#F2E164',
-  S: '#64F268',
-  Z: '#F26464',
-  I: '#64F2F2'
-};
+
+function getCurrentShapeColors() {
+  if (document.body.classList.contains('theme-light')) {
+    return {
+      T: '#a76cf2',
+      J: '#5085f2',
+      L: '#f2b66c',
+      O: '#f2e96c',
+      S: '#88f268',
+      Z: '#f26c6c',
+      I: '#6cf2f2'
+    };
+  } else if (document.body.classList.contains('theme-neon')) {
+    return {
+      T: '#ff00ff',
+      J: '#00ffff',
+      L: '#ffff00',
+      O: '#00ff00',
+      S: '#ff9900',
+      Z: '#ff0033',
+      I: '#33ccff'
+    };
+  } else if (document.body.classList.contains('theme-retro')) {
+    return {
+      T: '#4c5f3a',
+      J: '#3a4433',
+      L: '#6f7c4f',
+      O: '#b6cc70',
+      S: '#608518',
+      Z: '#354a23',
+      I: '#5a6e2c'
+    };
+  } else if (document.body.classList.contains('theme-matrix')) {
+    return {
+      T: '#0f0',
+      J: '#0c0',
+      L: '#0a0',
+      O: '#090',
+      S: '#0f5',
+      Z: '#0c5',
+      I: '#0fa'
+    };
+  } else {
+    return {
+      T: '#C864F2',
+      J: '#3264F2',
+      L: '#F2A464',
+      O: '#F2E164',
+      S: '#64F268',
+      Z: '#F26464',
+      I: '#64F2F2'
+    };
+  }
+}
 
 function createMatrix(w, h) {
   return Array.from({ length: h }, () => new Array(w).fill(null));
@@ -141,7 +186,8 @@ function playerReset() {
 function drawNext() {
   nextCtx.clearRect(0, 0, nextCanvas.width, nextCanvas.height);
   const mat = createPiece(nextPiece);
-  const color = shapeColors[nextPiece];
+  const colors = getCurrentShapeColors();
+  const color = colors[nextPiece];
   const offsetX = Math.floor((4 - mat[0].length) / 2);
   const offsetY = Math.floor((4 - mat.length) / 2);
 
@@ -157,8 +203,9 @@ function drawNext() {
 
 function drawCell(x, y, type, alpha = 1) {
   if (!type) return;
+  const colors = getCurrentShapeColors();
   ctx.globalAlpha = alpha;
-  ctx.fillStyle = shapeColors[type];
+  ctx.fillStyle = colors[type];
   ctx.fillRect(x * gridSize + 1, y * gridSize + 1, gridSize - 2, gridSize - 2);
   ctx.globalAlpha = 1;
 }
@@ -180,7 +227,13 @@ function getGhostPosition() {
 }
 
 function draw() {
-  ctx.fillStyle = '#101744';
+  const theme = document.body.className;
+  if (theme === 'theme-light') ctx.fillStyle = '#ffffff';
+  else if (theme === 'theme-neon') ctx.fillStyle = '#111';
+  else if (theme === 'theme-retro') ctx.fillStyle = '#8bac0f';
+  else if (theme === 'theme-matrix') ctx.fillStyle = '#000000';
+  else ctx.fillStyle = '#101744';
+
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
   ctx.strokeStyle = '#ffffff10';
@@ -239,8 +292,14 @@ btnPause.addEventListener('click', () => {
   paused = !paused;
   if (!paused) requestAnimationFrame(update);
 });
+const themes = ['theme-default', 'theme-light', 'theme-neon', 'theme-retro', 'theme-matrix'];
+let currentTheme = 0;
 btnTheme.addEventListener('click', () => {
-  document.body.classList.toggle('theme-alt');
+  document.body.classList.remove(themes[currentTheme]);
+  currentTheme = (currentTheme + 1) % themes.length;
+  document.body.classList.add(themes[currentTheme]);
+  draw();
+  drawNext();
 });
 
 function setLevel(ms) {
@@ -265,11 +324,3 @@ const arena = createMatrix(cols, rows);
 const player = { pos: {}, matrix: null, type: null };
 let startTime = performance.now();
 resetGame();
-const themes = ['theme-default', 'theme-light', 'theme-neon', 'theme-retro', 'theme-matrix'];
-let currentTheme = 0;
-
-document.getElementById('btn-theme').addEventListener('click', () => {
-  document.body.classList.remove(themes[currentTheme]);
-  currentTheme = (currentTheme + 1) % themes.length;
-  document.body.classList.add(themes[currentTheme]);
-});
