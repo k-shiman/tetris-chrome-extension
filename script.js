@@ -178,6 +178,7 @@ function playerReset() {
   player.pos.x = ((cols - player.matrix[0].length) / 2) | 0;
   if (collide(arena, player)) {
     messageEl.textContent = "You Lost!";
+    messageEl.style.color = 'red';
     gameOver = true;
   }
   drawNext();
