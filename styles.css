@@ -2,7 +2,7 @@ body {
   margin: 0;
   padding: 10px;
   width: 260px;
-  background: #f5f5f5;
+  background: #0a0f3c;
   font-family: sans-serif;
   user-select: none;
 }
@@ -11,17 +11,17 @@ body {
   justify-content: space-between;
   align-items: center;
 }
-#ui button {
+.btn-group button {
   margin-right: 5px;
   padding: 4px 8px;
-  background: #666;
+  background: #2a3a7c;
   color: #fff;
   border: none;
   border-radius: 3px;
   cursor: pointer;
 }
-#ui button:hover {
-  background: #555;
+.btn-group button:hover {
+  background: #3a4a9c;
 }
 #status {
   display: flex;
@@ -30,10 +30,21 @@ body {
 }
 #status span {
   font-size: 14px;
+  color: #eee;
 }
 canvas {
   display: block;
   margin: 10px auto;
-  background: #222;
-  border: 2px solid #555;
+  background: #101744;
+  border: 2px solid #3a4a9c;
+}
+.cell-color {
+  stroke: #000;
+  stroke-width: 1;
+}
+#message {
+  text-align: center;
+  color: #f55;
+  font-size: 18px;
+  margin-top: 6px;
 }
