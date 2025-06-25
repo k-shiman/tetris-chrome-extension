@@ -68,11 +68,12 @@ Use the **Pause** and **Change Theme** buttons for control via mouse.
 ---
 
 ## 🖼️ Screenshots
-![gameplay image 3](https://github.com/user-attachments/assets/a09def45-aa5d-4657-8948-7a6c7ac9680b)
-![gameplay image 2](https://github.com/user-attachments/assets/956a906b-3418-4cd0-a87f-f83cf28c46c7)
-![gameplay image 1](https://github.com/user-attachments/assets/9c10952d-5855-426c-bce5-50b9ab270f8d)
-![gameplay image 5](https://github.com/user-attachments/assets/c3e0a5e1-1773-4dbb-9205-8fee6f784439)
-![gameplay image 4](https://github.com/user-attachments/assets/45e890c3-9a85-4f48-ac83-118370d6855a)
+![gameplay_photo4](https://github.com/user-attachments/assets/d14f0095-4292-46c8-bdcf-d2bd478947b4)
+![gameplay_photo3](https://github.com/user-attachments/assets/c37267aa-e4bf-4c20-bdfd-e0b17c059965)
+![gameplay_photo2](https://github.com/user-attachments/assets/3b99a4c9-14ce-4823-beff-96d09e5f5a75)
+![gameplay_photo1](https://github.com/user-attachments/assets/315c07e4-6b44-49dd-8dca-36bb59578b6a)
+![gameplay_photo5](https://github.com/user-attachments/assets/9fdaac3a-edcf-4eba-8569-75b7d4244c3a)
+
 
 
 
