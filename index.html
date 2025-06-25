@@ -6,20 +6,30 @@
   <title>Tetris</title>
   <link rel="stylesheet" href="style.css" />
 </head>
-<body>
+<body class="theme-dark">
   <div id="ui">
     <div class="btn-group">
       <button id="btn-easy">Easy</button>
       <button id="btn-medium">Medium</button>
       <button id="btn-hard">Hard</button>
+      <button id="btn-theme">☀️/🌙</button>
     </div>
     <div id="status">
       <span>Score: <span id="score">0</span></span>
       <span>Time: <span id="timer">0</span>s</span>
     </div>
   </div>
-  <canvas id="tetris"></canvas>
+  <div id="canvas-wrapper">
+    <canvas id="tetris"></canvas>
+  </div>
   <div id="message"></div>
+  <script>
+    // Simple theme switcher
+    document.getElementById('btn-theme').onclick = () => {
+      document.body.classList.toggle('theme-dark');
+      document.body.classList.toggle('theme-light');
+    };
+  </script>
   <script src="script.js"></script>
 </body>
 </html>
