@@ -26,7 +26,7 @@ const shapeColors = {
 };
 
 function createMatrix(w, h) {
-  return Array.from({length: h}, () => new Array(w).fill(null));
+  return Array.from({ length: h }, () => new Array(w).fill(null));
 }
 
 function createPiece(type) {
@@ -40,10 +40,11 @@ function createPiece(type) {
 }
 
 function collide(arena, player) {
-  const { matrix: m, pos: o } = player;
-  for (let y = 0; y < m.length; ++y) {
-    for (let x = 0; x < m[y].length; ++x) {
-      if (m[y][x] && (arena[y + o.y] && arena[y + o.y][x + o.x]) !== null) {
+  const { matrix, pos } = player;
+  for (let y = 0; y < matrix.length; ++y) {
+    for (let x = 0; x < matrix[y].length; ++x) {
+      if (matrix[y][x] &&
+         (arena[y + pos.y] && arena[y + pos.y][x + pos.x]) !== null) {
         return true;
       }
     }
@@ -61,69 +62,19 @@ function merge(arena, player) {
   });
 }
 
-async function arenaSweep() {
-  let lines = [];
-
-  for (let y = arena.length - 1; y >= 0; --y) {
-    if (arena[y].every(cell => cell !== null)) {
-      lines.push(y);
+function arenaSweep() {
+  let rowCount = 1;
+  outer: for (let y = arena.length - 1; y >= 0; --y) {
+    for (let x = 0; x < arena[y].length; ++x) {
+      if (arena[y][x] === null) continue outer;
     }
-  }
-
-  for (let i = 0; i < lines.length; i++) {
-    const y = lines[i];
-    for (let x = 0; x < cols; x++) {
-      arena[y][x] = null;
-      draw();
-      await new Promise(res => setTimeout(res, 30));
-    }
-  }
-
-  for (const y of lines) {
     arena.splice(y, 1);
     arena.unshift(new Array(cols).fill(null));
-  }
-
-  if (lines.length > 0) {
-    score += lines.length * 10;
+    score += rowCount * 10;
+    rowCount *= 2;
     scoreEl.textContent = score;
+    ++y;
   }
-}
-
-function getGhostY() {
-  let ghostY = player.pos.y;
-  while (!collide(arena, { pos: {x: player.pos.x, y: ghostY + 1}, matrix: player.matrix })) {
-    ghostY++;
-  }
-  return ghostY;
-}
-
-function drawCell(x, y, type, ghost = false) {
-  if (!type) return;
-  ctx.fillStyle = ghost ? 'rgba(255,255,255,0.1)' : shapeColors[type];
-  ctx.fillRect(x * gridSize + 1, y * gridSize + 1, gridSize - 2, gridSize - 2);
-}
-
-function drawMatrix(mat, offset, type, ghost = false) {
-  mat.forEach((row, y) => {
-    row.forEach((val, x) => {
-      if (val) drawCell(x + offset.x, y + offset.y, type, ghost);
-    });
-  });
-}
-
-function draw() {
-  ctx.fillStyle = '#101744';
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-  arena.forEach((row, y) => {
-    row.forEach((val, x) => drawCell(x, y, val));
-  });
-
-  const ghostY = getGhostY();
-  drawMatrix(player.matrix, {x: player.pos.x, y: ghostY}, player.type, true);
-
-  drawMatrix(player.matrix, player.pos, player.type);
 }
 
 function playerDrop() {
@@ -142,27 +93,25 @@ function playerMove(dir) {
   if (collide(arena, player)) player.pos.x -= dir;
 }
 
-function playerRotate(dir) {
-  const m = player.matrix;
-  const cloned = m.map(row => [...row]);
-  for (let y = 0; y < m.length; ++y) {
-    for (let x = 0; x < y; ++x) {
-      [cloned[x][y], cloned[y][x]] = [cloned[y][x], cloned[x][y]];
-    }
-  }
-  if (dir > 0) cloned.forEach(row => row.reverse());
-  else cloned.reverse();
+function rotateMatrix(matrix) {
+  return matrix[0].map((_, i) => matrix.map(row => row[i])).reverse();
+}
 
-  const oldPos = player.pos.x;
+function playerRotate(dir) {
+  const original = player.matrix;
+  let rotated = rotateMatrix(player.matrix);
+  if (dir < 0) rotated.reverse();
+
+  const pos = player.pos.x;
   let offset = 1;
-  player.matrix = cloned;
+  player.matrix = rotated;
 
   while (collide(arena, player)) {
     player.pos.x += offset;
     offset = -(offset + (offset > 0 ? 1 : -1));
     if (offset > player.matrix[0].length) {
-      player.matrix = m;
-      player.pos.x = oldPos;
+      player.matrix = original;
+      player.pos.x = pos;
       return;
     }
   }
@@ -178,6 +127,60 @@ function playerReset() {
     messageEl.textContent = "You Lost!";
     gameOver = true;
   }
+}
+
+function drawCell(x, y, type, alpha = 1) {
+  if (!type) return;
+  ctx.globalAlpha = alpha;
+  ctx.fillStyle = shapeColors[type];
+  ctx.fillRect(x * gridSize + 1, y * gridSize + 1, gridSize - 2, gridSize - 2);
+  ctx.globalAlpha = 1;
+}
+
+function drawMatrix(matrix, offset, type, alpha = 1) {
+  matrix.forEach((row, y) => {
+    row.forEach((val, x) => {
+      if (val) drawCell(x + offset.x, y + offset.y, type, alpha);
+    });
+  });
+}
+
+function getGhostPosition() {
+  let ghostY = player.pos.y;
+  while (!collide(arena, { matrix: player.matrix, pos: { x: player.pos.x, y: ghostY + 1 } })) {
+    ghostY++;
+  }
+  return { x: player.pos.x, y: ghostY };
+}
+
+function draw() {
+  ctx.fillStyle = '#101744';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  // Draw guideline grid
+  ctx.strokeStyle = '#ffffff10';
+  for (let x = 1; x < cols; x++) {
+    ctx.beginPath();
+    ctx.moveTo(x * gridSize, 0);
+    ctx.lineTo(x * gridSize, canvas.height);
+    ctx.stroke();
+  }
+  for (let y = 1; y < rows; y++) {
+    ctx.beginPath();
+    ctx.moveTo(0, y * gridSize);
+    ctx.lineTo(canvas.width, y * gridSize);
+    ctx.stroke();
+  }
+
+  arena.forEach((row, y) => {
+    row.forEach((val, x) => drawCell(x, y, val));
+  });
+
+  // Draw ghost
+  const ghostPos = getGhostPosition();
+  drawMatrix(player.matrix, ghostPos, player.type, 0.25);
+
+  drawMatrix(player.matrix, player.pos, player.type);
 }
 
 let dropCounter = 0;
@@ -228,6 +231,6 @@ function resetGame() {
 }
 
 const arena = createMatrix(cols, rows);
-const player = {pos: {}, matrix: null, type: null};
+const player = { pos: {}, matrix: null, type: null };
 let startTime = performance.now();
 resetGame();

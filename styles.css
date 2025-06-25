@@ -6,11 +6,13 @@ body {
   font-family: sans-serif;
   user-select: none;
 }
+
 #ui {
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
+
 .btn-group button {
   margin-right: 5px;
   padding: 4px 8px;
@@ -23,6 +25,7 @@ body {
 .btn-group button:hover {
   background: #3a4a9c;
 }
+
 #status {
   display: flex;
   justify-content: space-between;
@@ -32,16 +35,14 @@ body {
   font-size: 14px;
   color: #eee;
 }
+
 canvas {
   display: block;
   margin: 10px auto;
   background: #101744;
   border: 2px solid #3a4a9c;
 }
-.cell-color {
-  stroke: #000;
-  stroke-width: 1;
-}
+
 #message {
   text-align: center;
   color: #f55;
