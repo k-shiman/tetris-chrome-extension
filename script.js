@@ -26,27 +26,24 @@ const shapeColors = {
 };
 
 function createMatrix(w, h) {
-  return Array.from({ length: h }, () => new Array(w).fill(null));
+  return Array.from({length: h}, () => new Array(w).fill(null));
 }
 
 function createPiece(type) {
-  if (type === 'T') return [[0, 1, 0], [1, 1, 1]];
-  if (type === 'J') return [[1, 0, 0], [1, 1, 1]];
-  if (type === 'L') return [[0, 0, 1], [1, 1, 1]];
-  if (type === 'O') return [[1, 1], [1, 1]];
-  if (type === 'S') return [[0, 1, 1], [1, 1, 0]];
-  if (type === 'Z') return [[1, 1, 0], [0, 1, 1]];
-  if (type === 'I') return [[1, 1, 1, 1]];
+  if (type === 'T') return [[0,1,0],[1,1,1]];
+  if (type === 'J') return [[1,0,0],[1,1,1]];
+  if (type === 'L') return [[0,0,1],[1,1,1]];
+  if (type === 'O') return [[1,1],[1,1]];
+  if (type === 'S') return [[0,1,1],[1,1,0]];
+  if (type === 'Z') return [[1,1,0],[0,1,1]];
+  if (type === 'I') return [[1,1,1,1]];
 }
 
 function collide(arena, player) {
-  const { matrix, pos } = player;
-  for (let y = 0; y < matrix.length; ++y) {
-    for (let x = 0; x < matrix[y].length; ++x) {
-      if (
-        matrix[y][x] &&
-        (arena[y + pos.y] && arena[y + pos.y][x + pos.x]) !== null
-      ) {
+  const { matrix: m, pos: o } = player;
+  for (let y = 0; y < m.length; ++y) {
+    for (let x = 0; x < m[y].length; ++x) {
+      if (m[y][x] && (arena[y + o.y] && arena[y + o.y][x + o.x]) !== null) {
         return true;
       }
     }
@@ -64,19 +61,69 @@ function merge(arena, player) {
   });
 }
 
-function arenaSweep() {
-  let rowCount = 1;
-  outer: for (let y = arena.length - 1; y >= 0; --y) {
-    for (let x = 0; x < arena[y].length; ++x) {
-      if (arena[y][x] === null) continue outer;
+async function arenaSweep() {
+  let lines = [];
+
+  for (let y = arena.length - 1; y >= 0; --y) {
+    if (arena[y].every(cell => cell !== null)) {
+      lines.push(y);
     }
+  }
+
+  for (let i = 0; i < lines.length; i++) {
+    const y = lines[i];
+    for (let x = 0; x < cols; x++) {
+      arena[y][x] = null;
+      draw();
+      await new Promise(res => setTimeout(res, 30));
+    }
+  }
+
+  for (const y of lines) {
     arena.splice(y, 1);
     arena.unshift(new Array(cols).fill(null));
-    score += rowCount * 10;
-    rowCount *= 2;
-    scoreEl.textContent = score;
-    ++y;
   }
+
+  if (lines.length > 0) {
+    score += lines.length * 10;
+    scoreEl.textContent = score;
+  }
+}
+
+function getGhostY() {
+  let ghostY = player.pos.y;
+  while (!collide(arena, { pos: {x: player.pos.x, y: ghostY + 1}, matrix: player.matrix })) {
+    ghostY++;
+  }
+  return ghostY;
+}
+
+function drawCell(x, y, type, ghost = false) {
+  if (!type) return;
+  ctx.fillStyle = ghost ? 'rgba(255,255,255,0.1)' : shapeColors[type];
+  ctx.fillRect(x * gridSize + 1, y * gridSize + 1, gridSize - 2, gridSize - 2);
+}
+
+function drawMatrix(mat, offset, type, ghost = false) {
+  mat.forEach((row, y) => {
+    row.forEach((val, x) => {
+      if (val) drawCell(x + offset.x, y + offset.y, type, ghost);
+    });
+  });
+}
+
+function draw() {
+  ctx.fillStyle = '#101744';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  arena.forEach((row, y) => {
+    row.forEach((val, x) => drawCell(x, y, val));
+  });
+
+  const ghostY = getGhostY();
+  drawMatrix(player.matrix, {x: player.pos.x, y: ghostY}, player.type, true);
+
+  drawMatrix(player.matrix, player.pos, player.type);
 }
 
 function playerDrop() {
@@ -95,32 +142,27 @@ function playerMove(dir) {
   if (collide(arena, player)) player.pos.x -= dir;
 }
 
-function rotateMatrix(matrix) {
-  const rows = matrix.length;
-  const cols = matrix[0].length;
-  const rotated = Array.from({ length: cols }, () => Array(rows).fill(0));
-  for (let y = 0; y < rows; ++y) {
-    for (let x = 0; x < cols; ++x) {
-      rotated[x][rows - 1 - y] = matrix[y][x];
+function playerRotate(dir) {
+  const m = player.matrix;
+  const cloned = m.map(row => [...row]);
+  for (let y = 0; y < m.length; ++y) {
+    for (let x = 0; x < y; ++x) {
+      [cloned[x][y], cloned[y][x]] = [cloned[y][x], cloned[x][y]];
     }
   }
-  return rotated;
-}
+  if (dir > 0) cloned.forEach(row => row.reverse());
+  else cloned.reverse();
 
-
-function playerRotate() {
-  const prevMatrix = player.matrix;
-  const rotated = rotateMatrix(player.matrix);
-
-  player.matrix = rotated;
-  const pos = player.pos.x;
+  const oldPos = player.pos.x;
   let offset = 1;
+  player.matrix = cloned;
+
   while (collide(arena, player)) {
     player.pos.x += offset;
     offset = -(offset + (offset > 0 ? 1 : -1));
     if (offset > player.matrix[0].length) {
-      player.matrix = prevMatrix;
-      player.pos.x = pos;
+      player.matrix = m;
+      player.pos.x = oldPos;
       return;
     }
   }
@@ -136,29 +178,6 @@ function playerReset() {
     messageEl.textContent = "You Lost!";
     gameOver = true;
   }
-}
-
-function drawCell(x, y, type) {
-  if (!type) return;
-  ctx.fillStyle = shapeColors[type];
-  ctx.fillRect(x * gridSize + 1, y * gridSize + 1, gridSize - 2, gridSize - 2);
-}
-
-function drawMatrix(mat, offset, type) {
-  mat.forEach((row, y) => {
-    row.forEach((val, x) => {
-      if (val) drawCell(x + offset.x, y + offset.y, type);
-    });
-  });
-}
-
-function draw() {
-  ctx.fillStyle = '#101744';
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
-  arena.forEach((row, y) => {
-    row.forEach((val, x) => drawCell(x, y, val));
-  });
-  drawMatrix(player.matrix, player.pos, player.type);
 }
 
 let dropCounter = 0;
@@ -183,7 +202,7 @@ document.addEventListener('keydown', event => {
   if (event.key === 'ArrowLeft') playerMove(-1);
   else if (event.key === 'ArrowRight') playerMove(1);
   else if (event.key === 'ArrowDown') playerDrop();
-  else if (event.key === 'w' || event.key === 'ArrowUp') playerRotate();
+  else if (event.key === 'w' || event.key === 'ArrowUp') playerRotate(1);
 });
 
 btnEasy.addEventListener('click', () => setLevel(1000));
@@ -209,6 +228,6 @@ function resetGame() {
 }
 
 const arena = createMatrix(cols, rows);
-const player = { pos: {}, matrix: null, type: null };
+const player = {pos: {}, matrix: null, type: null};
 let startTime = performance.now();
 resetGame();
