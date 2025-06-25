@@ -1,11 +1,16 @@
 const canvas = document.getElementById('tetris');
 const ctx = canvas.getContext('2d');
 
+const nextCanvas = document.getElementById("next");
+const nextCtx = nextCanvas.getContext("2d");
+
 const scoreEl = document.getElementById('score');
 const timerEl = document.getElementById('timer');
 const btnEasy = document.getElementById('btn-easy');
 const btnMedium = document.getElementById('btn-medium');
 const btnHard = document.getElementById('btn-hard');
+const btnTheme = document.getElementById('btn-theme');
+const btnPause = document.getElementById('btn-pause');
 const messageEl = document.getElementById('message');
 
 const gridSize = 20;
@@ -117,8 +122,11 @@ function playerRotate(dir) {
   }
 }
 
+let nextPiece = null;
+
 function playerReset() {
-  const type = shapes[Math.floor(Math.random() * shapes.length)];
+  const type = nextPiece || shapes[Math.floor(Math.random() * shapes.length)];
+  nextPiece = shapes[Math.floor(Math.random() * shapes.length)];
   player.type = type;
   player.matrix = createPiece(type);
   player.pos.y = 0;
@@ -127,6 +135,24 @@ function playerReset() {
     messageEl.textContent = "You Lost!";
     gameOver = true;
   }
+  drawNext();
+}
+
+function drawNext() {
+  nextCtx.clearRect(0, 0, nextCanvas.width, nextCanvas.height);
+  const mat = createPiece(nextPiece);
+  const color = shapeColors[nextPiece];
+  const offsetX = Math.floor((4 - mat[0].length) / 2);
+  const offsetY = Math.floor((4 - mat.length) / 2);
+
+  mat.forEach((row, y) => {
+    row.forEach((val, x) => {
+      if (val) {
+        nextCtx.fillStyle = color;
+        nextCtx.fillRect((x + offsetX) * 20 + 1, (y + offsetY) * 20 + 1, 18, 18);
+      }
+    });
+  });
 }
 
 function drawCell(x, y, type, alpha = 1) {
@@ -157,7 +183,6 @@ function draw() {
   ctx.fillStyle = '#101744';
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-  // Draw guideline grid
   ctx.strokeStyle = '#ffffff10';
   for (let x = 1; x < cols; x++) {
     ctx.beginPath();
@@ -176,10 +201,8 @@ function draw() {
     row.forEach((val, x) => drawCell(x, y, val));
   });
 
-  // Draw ghost
   const ghostPos = getGhostPosition();
   drawMatrix(player.matrix, ghostPos, player.type, 0.25);
-
   drawMatrix(player.matrix, player.pos, player.type);
 }
 
@@ -188,9 +211,10 @@ let dropInterval = 1000;
 let lastTime = 0;
 let score = 0;
 let gameOver = false;
+let paused = false;
 
 function update(time = 0) {
-  if (gameOver) return;
+  if (gameOver || paused) return;
   const delta = time - lastTime;
   lastTime = time;
   dropCounter += delta;
@@ -201,7 +225,7 @@ function update(time = 0) {
 }
 
 document.addEventListener('keydown', event => {
-  if (gameOver) return;
+  if (gameOver || paused) return;
   if (event.key === 'ArrowLeft') playerMove(-1);
   else if (event.key === 'ArrowRight') playerMove(1);
   else if (event.key === 'ArrowDown') playerDrop();
@@ -211,6 +235,13 @@ document.addEventListener('keydown', event => {
 btnEasy.addEventListener('click', () => setLevel(1000));
 btnMedium.addEventListener('click', () => setLevel(500));
 btnHard.addEventListener('click', () => setLevel(200));
+btnPause.addEventListener('click', () => {
+  paused = !paused;
+  if (!paused) requestAnimationFrame(update);
+});
+btnTheme.addEventListener('click', () => {
+  document.body.classList.toggle('theme-alt');
+});
 
 function setLevel(ms) {
   dropInterval = ms;
@@ -234,3 +265,11 @@ const arena = createMatrix(cols, rows);
 const player = { pos: {}, matrix: null, type: null };
 let startTime = performance.now();
 resetGame();
+const themes = ['theme-default', 'theme-light', 'theme-neon', 'theme-retro', 'theme-matrix'];
+let currentTheme = 0;
+
+document.getElementById('btn-theme').addEventListener('click', () => {
+  document.body.classList.remove(themes[currentTheme]);
+  currentTheme = (currentTheme + 1) % themes.length;
+  document.body.classList.add(themes[currentTheme]);
+});
