@@ -4,6 +4,12 @@ A minimalist **Tetris game** built as a Chrome Extension. Classic gameplay with 
 
 ---
 
+## 🔗 Chrome Extension Store
+  
+[Chrome Web Store Link](https://chromewebstore.google.com/detail/tetris-game/mkjcelljpjjlblgbobjeblfijbcbkkpm?authuser=1&hl=en-US)
+
+---
+
 ## 🛠️ Built With
 
 - **HTML5** – canvas structure and UI layout  
@@ -74,13 +80,6 @@ Use the **Pause** and **Change Theme** buttons for control via mouse.
 ![gameplay_photo1](https://github.com/user-attachments/assets/315c07e4-6b44-49dd-8dca-36bb59578b6a)
 ![gameplay_photo5](https://github.com/user-attachments/assets/9fdaac3a-edcf-4eba-8569-75b7d4244c3a)
 
-
----
-
-## 🔗 Chrome Extension Store
-
-**Coming Soon**  
-[Chrome Web Store Link](https://chromewebstore.google.com/detail/tetris-game/mkjcelljpjjlblgbobjeblfijbcbkkpm?authuser=1&hl=en-US)
 
 ---
 
