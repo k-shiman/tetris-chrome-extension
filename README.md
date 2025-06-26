@@ -79,6 +79,8 @@ Use the **Pause** and **Change Theme** buttons for control via mouse.
 
 ## 🔗 Chrome Extension Store
 
+https://chromewebstore.google.com/detail/tetris-game/mkjcelljpjjlblgbobjeblfijbcbkkpm?authuser=1&hl=en-US
+
 **Coming Soon**  
 [Chrome Web Store Link](https://chrome.google.com/webstore/detail/...)
 
