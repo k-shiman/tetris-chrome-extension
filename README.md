@@ -1,6 +1,6 @@
-# 🧱 Tetris Chrome Extension
+# 🧱 StackBlitz Chrome Extension
 
-A minimalist **Tetris game** built as a Chrome Extension. Classic gameplay with modern themes, smooth controls, and a clean interface — playable directly in your browser popup.
+A minimalist **StackBlitz game** built as a Chrome Extension. Classic gameplay with modern themes, smooth controls, and a clean interface — playable directly in your browser popup.
 
 ---
 
@@ -14,7 +14,7 @@ A minimalist **Tetris game** built as a Chrome Extension. Classic gameplay with 
 
 - **HTML5** – canvas structure and UI layout  
 - **CSS3** – responsive design, custom themes, and styling  
-- **Vanilla JavaScript** – core game logic, rendering, controls, and state management  
+- **JavaScript** – core game logic, rendering, controls, and state management  
 - **Canvas API** – rendering the grid, tetrominoes, ghost piece, and next preview  
 - **Chrome Extension API (Manifest V3)** – packaged as a browser extension  
 
